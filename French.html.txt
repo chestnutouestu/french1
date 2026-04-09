@@ -1,0 +1,1389 @@
+
+<!DOCTYPE html>
+
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Conjugaison</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;600&display=swap');
+
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+DESIGN TOKENS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+:root {
+/* Brand palette */
+–navy:      #1a3776;
+–navy-deep: #122759;
+–navy-mid:  #2d4d94;
+–mid:       #5c6aa3;
+–mid-light: #7a88bc;
+–sky:       #8abae6;
+–sky-light: #b8d6f0;
+–cream:     #e4dedc;
+–cream-dark:#d4ccc9;
+–cream-mid: #ede8e6;
+
+/* Neutrals */
+–white:     #ffffff;
+–off-white: #f8f7f6;
+–ink:       #1a1d2e;
+–ink-mid:   #3a3f5c;
+–ink-soft:  #6b7191;
+–ink-faint: #a0a8c0;
+–divider:   rgba(26,55,118,.10);
+
+/* Semantic */
+–ok:        #1e6e4a;
+–ok-bg:     rgba(30,110,74,.07);
+–ok-border: rgba(30,110,74,.18);
+–err:       #8b1e35;
+–err-bg:    rgba(139,30,53,.07);
+–err-border:rgba(139,30,53,.18);
+
+/* Glass layers */
+–glass-1: rgba(255,255,255,.62);  /* cards */
+–glass-2: rgba(255,255,255,.46);  /* inner blocks */
+–glass-3: rgba(255,255,255,.80);  /* header */
+–glass-border: rgba(255,255,255,.82);
+–glass-blur: blur(22px) saturate(160%);
+
+/* Shadows — tinted with navy */
+–shadow-card:  0 4px 20px rgba(26,55,118,.07), 0 1px 4px rgba(26,55,118,.05);
+–shadow-float: 0 12px 36px rgba(26,55,118,.13), 0 3px 8px rgba(26,55,118,.07);
+–shadow-btn:   0 2px 8px rgba(26,55,118,.18);
+–shadow-btn-active: 0 1px 2px rgba(26,55,118,.12);
+–shadow-modal: 0 24px 64px rgba(26,55,118,.22), 0 4px 12px rgba(26,55,118,.10);
+
+/* Radii — nested correctly: outer > inner */
+–r-xl:  20px;
+–r-lg:  14px;
+–r-md:  10px;
+–r-sm:  7px;
+–r-xs:  5px;
+
+/* Typography */
+–serif: ‘Times New Roman’, Times, Georgia, serif;
+–sans:  ‘Noto Sans SC’, -apple-system, BlinkMacSystemFont, sans-serif;
+
+/* Spacing scale */
+–sp-2:  4px;
+–sp-3:  6px;
+–sp-4:  8px;
+–sp-5: 10px;
+–sp-6: 12px;
+–sp-7: 14px;
+–sp-8: 16px;
+–sp-10:20px;
+–sp-12:24px;
+–sp-16:32px;
+–sp-20:40px;
+–sp-24:48px;
+
+/* Transitions */
+–t-fast: .14s cubic-bezier(.4,0,.2,1);
+–t-base: .22s cubic-bezier(.4,0,.2,1);
+–t-slow: .38s cubic-bezier(.4,0,.2,1);
+/* Spring for buttons */
+–t-spring: .5s cubic-bezier(.34,1.56,.64,1);
+}
+
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+RESET
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
+html,body{height:100%;width:100%;}
+button{cursor:pointer;font-family:inherit;border:none;background:none;}
+input,select{font-family:inherit;}
+a{text-decoration:none;}
+
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+VIEWPORT BACKGROUND — rich gradient so
+glassmorphism has something to blur
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+body {
+font-family: var(–sans);
+font-size: 14px;
+line-height: 1.55;
+color: var(–ink);
+/* Multi-stop gradient spanning the brand palette */
+background:
+linear-gradient(135deg,
+#dce8f8 0%,
+#c8d9f0 22%,
+#d6dff5 44%,
+#e4dedc 68%,
+#ccd8ee 100%);
+background-attachment: fixed;
+min-height: 100vh;
+overflow: hidden;           /* body never scrolls — only #app does */
+display: flex;
+align-items: center;
+justify-content: center;
+padding: 24px 16px;         /* breathing room around the floating card */
+}
+
+/* Ambient light orbs sit on the viewport, behind everything */
+body::before {
+content:’’;
+position:fixed;
+width:680px;height:680px;
+top:-160px;left:-160px;
+border-radius:50%;
+background: radial-gradient(circle at 40% 40%,
+rgba(26,55,118,.16) 0%,
+rgba(138,186,230,.10) 45%,
+transparent 70%);
+pointer-events:none;
+z-index:0;
+}
+body::after {
+content:’’;
+position:fixed;
+width:520px;height:520px;
+bottom:-120px;right:-80px;
+border-radius:50%;
+background: radial-gradient(circle,
+rgba(92,106,163,.13) 0%,
+rgba(138,186,230,.08) 50%,
+transparent 70%);
+pointer-events:none;
+z-index:0;
+}
+
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+#APP — THE FLOATING GLASS WINDOW
+This is the single card that sits centred
+over the gradient background.
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+#app {
+position: relative;
+z-index: 1;
+display: flex;
+flex-direction: column;
+
+/* Floating card geometry */
+width: 100%;
+max-width: 900px;
+height: calc(100vh - 48px);   /* viewport minus body padding */
+max-height: 860px;
+
+/* Glassmorphism window */
+background: rgba(255,255,255,0.68);
+backdrop-filter: blur(28px) saturate(180%);
+-webkit-backdrop-filter: blur(28px) saturate(180%);
+border-radius: 24px;
+border: 1px solid rgba(255,255,255,0.80);
+box-shadow:
+0 32px 80px rgba(26,55,118,.18),
+0 8px 24px rgba(26,55,118,.10),
+0 1px 0 rgba(255,255,255,.90) inset,   /* top rim highlight */
+0 0 0 1px rgba(26,55,118,.06);         /* subtle outer ring */
+
+/* Content scrolls inside; window does not move */
+overflow: hidden;
+}
+
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+HEADER — pinned inside the glass window,
+inherits the rounded top corners
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+header {
+flex-shrink: 0;
+z-index: 200;
+/* Slightly more opaque than the window — feels like a frosted title bar */
+background: rgba(255,255,255,0.78);
+backdrop-filter: blur(20px) saturate(160%);
+-webkit-backdrop-filter: blur(20px) saturate(160%);
+border-bottom: 1px solid rgba(255,255,255,0.75);
+box-shadow: 0 1px 0 rgba(26,55,118,.08);
+/* Match window’s top-left/right radius, no overflow */
+border-radius: 24px 24px 0 0;
+}
+.hdr {
+display: flex;
+align-items: center;
+padding: 0 var(–sp-12);
+height: 58px;
+gap: var(–sp-8);
+}
+.logo{
+display:flex;flex-direction:column;gap:1px;flex-shrink:0;
+}
+.logo-main{
+font-family:var(–serif);
+font-size:1.2rem;font-style:italic;
+color:var(–navy);letter-spacing:-.01em;line-height:1;
+}
+.logo-sub{
+font-size:.64rem;font-weight:500;
+letter-spacing:.13em;text-transform:uppercase;
+color:var(–mid);line-height:1;
+}
+.nav{display:flex;gap:var(–sp-2);margin-left:auto;}
+.nav-btn{
+display:flex;align-items:center;gap:var(–sp-2);
+padding:var(–sp-2) var(–sp-7);
+border-radius:var(–r-sm);
+color:var(–ink-soft);
+font-size:.82rem;font-weight:500;
+transition:var(–t-base);
+white-space:nowrap;
+}
+.nav-btn svg{width:14px;height:14px;flex-shrink:0;opacity:.65;transition:var(–t-base);}
+.nav-btn:hover{background:rgba(26,55,118,.06);color:var(–navy);}
+.nav-btn:hover svg{opacity:1;}
+.nav-btn.active{
+background:rgba(26,55,118,.09);
+color:var(–navy);font-weight:600;
+}
+.nav-btn.active svg{opacity:1;}
+
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+MAIN — scrollable content area inside window
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+main{
+flex:1;
+overflow-y:auto;
+overflow-x:hidden;
+-webkit-overflow-scrolling:touch;
+width:100%;
+padding:var(–sp-10) var(–sp-12) var(–sp-24);
+}
+
+/* Panels */
+.panel{display:none;}
+.panel.active{display:block;animation:riseIn .32s cubic-bezier(.4,0,.2,1) both;}
+@keyframes riseIn{from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:translateY(0);}}
+
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+GLASS CARD
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+.card{
+background:var(–glass-1);
+backdrop-filter:var(–glass-blur);
+-webkit-backdrop-filter:var(–glass-blur);
+border:1px solid var(–glass-border);
+border-radius:var(–r-xl);
+box-shadow:var(–shadow-card);
+padding:var(–sp-10) var(–sp-10);
+margin-bottom:var(–sp-8);
+/* Card hover float */
+transition:box-shadow var(–t-base), transform var(–t-base);
+will-change:transform,box-shadow;
+}
+.card:hover{
+box-shadow:var(–shadow-float);
+transform:translateY(-2px);
+}
+
+/* Card header row */
+.card-hdr{
+display:flex;align-items:center;justify-content:space-between;
+margin-bottom:var(–sp-8);
+padding-bottom:var(–sp-6);
+border-bottom:1px solid var(–divider);
+}
+.card-title{
+font-family:var(–serif);
+font-style:italic;font-size:1.08rem;
+color:var(–navy);
+display:flex;align-items:center;gap:var(–sp-5);
+line-height:1.2;
+}
+.card-title svg{
+width:16px;height:16px;
+color:var(–mid);flex-shrink:0;
+}
+.chip{
+font-family:var(–sans);font-style:normal;
+font-size:.68rem;font-weight:600;
+letter-spacing:.07em;text-transform:uppercase;
+padding:3px var(–sp-5);border-radius:20px;
+background:rgba(26,55,118,.07);
+color:var(–mid);
+}
+
+/* Divider */
+.div{border:none;border-top:1px solid var(–divider);margin:var(–sp-8) 0;}
+
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+TYPOGRAPHY HIERARCHY
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+.label{
+display:block;
+font-size:.68rem;font-weight:600;
+letter-spacing:.10em;text-transform:uppercase;
+color:var(–ink-faint);margin-bottom:var(–sp-3);
+}
+.sec-label{
+font-size:.68rem;font-weight:600;
+letter-spacing:.10em;text-transform:uppercase;
+color:var(–ink-faint);margin:var(–sp-8) 0 var(–sp-5);
+}
+.body-sm{font-size:.84rem;color:var(–ink-soft);line-height:1.5;}
+
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+FORM ELEMENTS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+.field{margin-bottom:var(–sp-6);}
+.field:last-child{margin-bottom:0;}
+.input,.sel{
+width:100%;
+padding:10px var(–sp-7);
+border:1.5px solid rgba(26,55,118,.12);
+border-radius:var(–r-md);
+background:rgba(255,255,255,.68);
+backdrop-filter:blur(8px);
+font-size:.9rem;color:var(–ink);
+transition:var(–t-base);
+-webkit-appearance:none;appearance:none;
+}
+.input::placeholder{color:var(–ink-faint);}
+.input:focus,.sel:focus{
+outline:none;
+border-color:rgba(26,55,118,.32);
+background:rgba(255,255,255,.92);
+box-shadow:0 0 0 3px rgba(26,55,118,.08);
+}
+.input-row{display:flex;gap:var(–sp-5);align-items:flex-end;}
+.input-row .field{flex:1;margin-bottom:0;}
+
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+BUTTONS — spring physics
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+.btn{
+display:inline-flex;align-items:center;justify-content:center;gap:6px;
+padding:10px var(–sp-10);
+border-radius:var(–r-md);
+font-size:.84rem;font-weight:600;
+letter-spacing:.01em;white-space:nowrap;flex-shrink:0;
+transition:box-shadow var(–t-base), background var(–t-base),
+transform var(–t-spring);
+will-change:transform;
+position:relative;user-select:none;
+}
+.btn svg{width:14px;height:14px;flex-shrink:0;}
+.btn:disabled{opacity:.38;cursor:not-allowed;transform:none!important;}
+
+/* Spring press */
+.btn:not(:disabled):active{
+transform:scale(.94)!important;
+transition:transform .08s cubic-bezier(.4,0,.6,1), box-shadow .08s;
+}
+/* Release bounce */
+.btn.spring-bounce{
+animation:springBounce var(–t-spring) cubic-bezier(.34,1.56,.64,1) both;
+}
+@keyframes springBounce{
+0%{transform:scale(.94);}
+60%{transform:scale(1.04);}
+80%{transform:scale(.98);}
+100%{transform:scale(1);}
+}
+
+/* Primary — solid navy */
+.btn-primary{
+background:var(–navy);color:var(–white);
+box-shadow:var(–shadow-btn);
+}
+.btn-primary:hover:not(:disabled){
+background:var(–navy-mid);
+box-shadow:0 4px 16px rgba(26,55,118,.28);
+transform:translateY(-1px);
+}
+
+/* Secondary — glass */
+.btn-ghost{
+background:rgba(255,255,255,.58);
+border:1.5px solid rgba(26,55,118,.13);
+color:var(–ink-mid);
+box-shadow:0 1px 3px rgba(26,55,118,.06);
+}
+.btn-ghost:hover:not(:disabled){
+background:rgba(255,255,255,.85);
+border-color:rgba(26,55,118,.22);
+color:var(–navy);
+}
+
+/* Danger */
+.btn-danger{
+background:transparent;
+border:1.5px solid rgba(139,30,53,.18);
+color:var(–err);
+}
+.btn-danger:hover:not(:disabled){
+background:var(–err-bg);
+border-color:rgba(139,30,53,.28);
+}
+
+/* Sizes */
+.btn-sm{padding:7px var(–sp-7);font-size:.78rem;}
+.btn-xs{padding:4px var(–sp-5);font-size:.72rem;border-radius:var(–r-xs);}
+.btn-fw{width:100%;}
+
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+LESSON LIST
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+.lesson-list{display:flex;flex-direction:column;gap:var(–sp-3);}
+.lesson-item{
+display:flex;align-items:center;gap:var(–sp-6);
+padding:12px var(–sp-7);
+border-radius:var(–r-lg);
+border:1.5px solid transparent;
+background:rgba(255,255,255,.38);
+cursor:pointer;
+transition:background var(–t-base),border-color var(–t-base),
+box-shadow var(–t-base),transform var(–t-spring);
+}
+.lesson-item:hover{
+background:rgba(255,255,255,.68);
+border-color:rgba(26,55,118,.10);
+box-shadow:0 3px 12px rgba(26,55,118,.08);
+transform:translateY(-1px);
+}
+.lesson-item.selected{
+background:rgba(255,255,255,.80);
+border-color:rgba(26,55,118,.22);
+box-shadow:0 4px 16px rgba(26,55,118,.10);
+}
+.lesson-dot{
+width:7px;height:7px;border-radius:50%;
+background:var(–cream-dark);flex-shrink:0;
+transition:background var(–t-base);
+}
+.lesson-item.selected .lesson-dot{background:var(–navy);}
+.lesson-name{
+flex:1;font-size:.92rem;font-weight:500;
+color:var(–ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+}
+.lesson-meta{font-size:.74rem;color:var(–ink-faint);white-space:nowrap;flex-shrink:0;}
+
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+VERB TABLE
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+.vtable{width:100%;border-collapse:collapse;}
+.vtable th{
+font-size:.66rem;font-weight:600;
+letter-spacing:.09em;text-transform:uppercase;
+color:var(–ink-faint);
+padding:0 var(–sp-5) var(–sp-5);
+text-align:left;
+border-bottom:1px solid var(–divider);
+}
+.vtable td{
+padding:12px var(–sp-5);
+border-bottom:1px solid rgba(26,55,118,.05);
+vertical-align:middle;
+}
+.vtable tr:last-child td{border-bottom:none;}
+.vtable tbody tr{transition:background var(–t-fast);}
+.vtable tbody tr:hover td{background:rgba(26,55,118,.03);}
+.verb-name{
+font-family:var(–serif);font-style:italic;
+font-size:1.01rem;color:var(–navy);
+}
+
+/* Status pills */
+.status{
+display:inline-flex;align-items:center;gap:4px;
+padding:3px var(–sp-5);border-radius:20px;
+font-size:.7rem;font-weight:600;letter-spacing:.03em;
+}
+.status-ok{background:var(–ok-bg);color:var(–ok);border:1px solid var(–ok-border);}
+.status-err{background:var(–err-bg);color:var(–err);border:1px solid var(–err-border);}
+
+/* Accuracy bar */
+.acc{display:flex;align-items:center;gap:var(–sp-4);}
+.acc-track{flex:1;height:3px;background:rgba(26,55,118,.09);border-radius:2px;min-width:48px;overflow:hidden;}
+.acc-fill{height:100%;border-radius:2px;transition:width .5s ease;}
+.acc-hi{background:var(–ok);}
+.acc-mid{background:var(–amber, #b45309);}
+.acc-lo{background:var(–err);}
+.acc-num{font-size:.72rem;color:var(–ink-faint);white-space:nowrap;}
+
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+QUIZ SETUP — TENSE CHECKBOXES
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+.tense-grid{
+display:grid;
+grid-template-columns:repeat(auto-fill,minmax(172px,1fr));
+gap:var(–sp-3);
+}
+
+/* The tense option pill */
+.tense-opt{
+display:flex;align-items:center;gap:var(–sp-5);
+padding:9px var(–sp-7);
+border-radius:var(–r-md);
+border:1.5px solid rgba(26,55,118,.11);
+background:rgba(255,255,255,.38);
+cursor:pointer;
+font-family:var(–serif);font-style:italic;font-size:.84rem;
+color:var(–ink-soft);
+user-select:none;
+transition:background var(–t-base),border-color var(–t-base),
+color var(–t-base),box-shadow var(–t-base),
+transform var(–t-spring);
+will-change:transform;
+}
+.tense-opt:hover{
+background:rgba(255,255,255,.65);
+border-color:rgba(26,55,118,.18);
+color:var(–ink-mid);
+transform:translateY(-1px);
+box-shadow:0 2px 8px rgba(26,55,118,.07);
+}
+/* SELECTED state — brand colored */
+.tense-opt.on{
+background:rgba(26,55,118,.08);
+border-color:rgba(26,55,118,.28);
+color:var(–navy);
+box-shadow:0 2px 10px rgba(26,55,118,.09);
+}
+.tense-opt input[type=checkbox]{display:none;}
+
+/* Checkbox visual */
+.tbox{
+width:16px;height:16px;border-radius:4px;
+border:1.5px solid rgba(26,55,118,.22);
+flex-shrink:0;display:flex;align-items:center;justify-content:center;
+transition:background var(–t-base),border-color var(–t-base);
+background:transparent;
+}
+.tense-opt.on .tbox{
+background:var(–navy);border-color:var(–navy);
+}
+.tbox-mark{
+display:none;
+width:9px;height:7px;
+}
+.tense-opt.on .tbox-mark{display:block;}
+
+/* Radio options */
+.radio-row{display:flex;gap:var(–sp-4);flex-wrap:wrap;}
+.radio-opt{
+display:flex;align-items:center;gap:var(–sp-5);
+padding:10px var(–sp-7);
+border-radius:var(–r-md);
+border:1.5px solid rgba(26,55,118,.11);
+background:rgba(255,255,255,.38);
+cursor:pointer;font-size:.88rem;
+color:var(–ink-soft);
+user-select:none;
+transition:background var(–t-base),border-color var(–t-base),
+color var(–t-base),transform var(–t-spring);
+}
+.radio-opt:hover{
+background:rgba(255,255,255,.68);transform:translateY(-1px);
+box-shadow:0 2px 8px rgba(26,55,118,.07);
+}
+.radio-opt.on{
+background:rgba(26,55,118,.08);
+border-color:rgba(26,55,118,.28);
+color:var(–navy);font-weight:600;
+}
+.radio-opt input{display:none;}
+.rdot{
+width:15px;height:15px;border-radius:50%;
+border:1.5px solid rgba(26,55,118,.22);
+flex-shrink:0;display:flex;align-items:center;justify-content:center;
+transition:border-color var(–t-base);
+}
+.radio-opt.on .rdot{border-color:var(–navy);}
+.rdot-inner{
+width:7px;height:7px;border-radius:50%;
+background:var(–navy);display:none;
+transition:transform var(–t-spring);
+}
+.radio-opt.on .rdot-inner{display:block;}
+
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+QUIZ
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+.prog-row{
+display:flex;align-items:center;gap:var(–sp-7);
+margin-bottom:var(–sp-10);
+}
+.prog-track{flex:1;height:2px;background:rgba(26,55,118,.10);border-radius:1px;overflow:hidden;}
+.prog-fill{height:100%;background:var(–navy);border-radius:1px;transition:width .55s ease;}
+.prog-label{font-size:.74rem;color:var(–ink-faint);white-space:nowrap;}
+.prog-score{font-size:.74rem;color:var(–ok);font-weight:700;white-space:nowrap;}
+
+/* Question card */
+.q-wrap{
+border:1.5px solid rgba(26,55,118,.10);
+border-radius:var(–r-lg);
+background:rgba(255,255,255,.30);
+padding:40px var(–sp-12) var(–sp-10);
+text-align:center;margin-bottom:var(–sp-8);
+}
+.q-tense{
+font-size:.66rem;font-weight:600;
+letter-spacing:.14em;text-transform:uppercase;
+color:var(–mid);margin-bottom:var(–sp-7);
+}
+.q-main{
+font-family:var(–serif);
+font-size:1.9rem;line-height:1.4;
+color:var(–ink);
+display:flex;align-items:baseline;
+justify-content:center;flex-wrap:wrap;gap:var(–sp-5);
+}
+.q-pron{color:var(–navy);}
+.q-blank{
+display:inline-block;
+border-bottom:2.5px solid var(–navy);
+min-width:130px;height:1.3em;
+vertical-align:bottom;
+opacity:.7;
+}
+.q-inf{font-size:.95rem;color:var(–ink-faint);font-style:italic;}
+
+/* Answer */
+.ans-row{display:flex;gap:var(–sp-5);margin-bottom:var(–sp-7);}
+#answer-input{
+flex:1;padding:12px var(–sp-8);
+border:1.5px solid rgba(26,55,118,.12);
+border-radius:var(–r-md);
+background:rgba(255,255,255,.72);
+font-family:var(–serif);font-style:italic;
+font-size:1.1rem;text-align:center;color:var(–ink);
+transition:var(–t-base);
+}
+#answer-input:focus{
+outline:none;
+border-color:rgba(26,55,118,.30);
+background:rgba(255,255,255,.95);
+box-shadow:0 0 0 3px rgba(26,55,118,.07);
+}
+#answer-input::placeholder{color:var(–ink-faint);font-style:normal;font-size:.88rem;}
+
+/* Result banner */
+.result-bar{
+padding:11px var(–sp-8);border-radius:var(–r-md);
+text-align:center;font-size:.9rem;font-weight:500;
+margin-bottom:var(–sp-7);display:none;
+font-family:var(–serif);font-style:italic;
+animation:resultPop .22s cubic-bezier(.4,0,.2,1) both;
+}
+@keyframes resultPop{from{opacity:0;transform:scale(.97);}to{opacity:1;transform:scale(1);}}
+.result-bar.correct{
+display:block;
+background:var(–ok-bg);color:var(–ok);
+border:1px solid var(–ok-border);
+}
+.result-bar.wrong{
+display:block;
+background:var(–err-bg);color:var(–err);
+border:1px solid var(–err-border);
+}
+
+.quiz-actions{display:flex;gap:var(–sp-5);justify-content:center;flex-wrap:wrap;}
+
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+KPI BLOCKS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+.kpi-row{
+display:grid;
+grid-template-columns:repeat(auto-fit,minmax(110px,1fr));
+gap:var(–sp-5);margin-bottom:var(–sp-8);
+}
+.kpi{
+background:rgba(255,255,255,.42);
+border:1px solid rgba(26,55,118,.09);
+border-radius:var(–r-lg);
+padding:var(–sp-8) var(–sp-7);
+text-align:center;
+transition:box-shadow var(–t-base),transform var(–t-base);
+}
+.kpi:hover{
+box-shadow:0 6px 20px rgba(26,55,118,.09);
+transform:translateY(-1px);
+}
+.kpi-num{
+font-family:var(–serif);
+font-size:1.85rem;line-height:1;
+color:var(–navy);
+}
+.kpi-lbl{
+font-size:.67rem;font-weight:600;
+letter-spacing:.07em;text-transform:uppercase;
+color:var(–ink-faint);margin-top:4px;
+}
+
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+RESULTS — WRONG LIST
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+.wrong-row{
+display:flex;align-items:baseline;gap:var(–sp-7);
+padding:10px 0;border-bottom:1px solid rgba(26,55,118,.06);
+}
+.wrong-row:last-child{border-bottom:none;}
+.wrong-q{flex:1;color:var(–ink-soft);font-family:var(–serif);font-style:italic;font-size:.88rem;line-height:1.4;}
+.wrong-right{
+color:var(–ok);font-family:var(–serif);
+font-style:italic;font-weight:600;font-size:.92rem;
+white-space:nowrap;
+}
+
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+CONJUGATION MODAL
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+.overlay{
+display:none;
+/* Scoped to the #app glass window, not the full viewport */
+position:absolute;inset:0;
+background:rgba(26,37,58,.42);
+backdrop-filter:blur(10px) saturate(140%);
+-webkit-backdrop-filter:blur(10px) saturate(140%);
+z-index:500;
+align-items:center;justify-content:center;padding:var(–sp-10);
+border-radius:24px;
+}
+.overlay.open{display:flex;animation:overlayIn .2s ease both;}
+@keyframes overlayIn{from{opacity:0;}to{opacity:1;}}
+
+.modal{
+background:rgba(248,247,246,.94);
+backdrop-filter:blur(28px) saturate(160%);
+-webkit-backdrop-filter:blur(28px) saturate(160%);
+border:1px solid rgba(255,255,255,.90);
+border-radius:var(–r-xl);
+box-shadow:var(–shadow-modal);
+padding:var(–sp-12);
+max-width:640px;width:100%;
+max-height:88vh;overflow-y:auto;
+position:relative;
+animation:modalIn .28s cubic-bezier(.4,0,.2,1) both;
+}
+@keyframes modalIn{from{opacity:0;transform:scale(.96) translateY(6px);}to{opacity:1;transform:scale(1) translateY(0);}}
+
+.modal-close{
+position:absolute;top:var(–sp-8);right:var(–sp-8);
+width:30px;height:30px;border-radius:50%;
+border:1px solid rgba(26,55,118,.12);
+background:rgba(255,255,255,.60);
+display:flex;align-items:center;justify-content:center;
+cursor:pointer;color:var(–ink-soft);
+transition:var(–t-base);
+}
+.modal-close:hover{background:rgba(255,255,255,.92);color:var(–navy);}
+.modal-close svg{width:12px;height:12px;}
+
+.modal-title{
+font-family:var(–serif);font-style:italic;
+font-size:1.5rem;color:var(–navy);
+margin-bottom:var(–sp-8);
+padding-right:var(–sp-12);
+line-height:1.2;
+}
+
+.conj-grid{display:grid;grid-template-columns:1fr 1fr;gap:var(–sp-5);}
+.conj-block{
+border:1px solid rgba(26,55,118,.09);
+border-radius:var(–r-md);overflow:hidden;
+background:rgba(255,255,255,.50);
+}
+.conj-head{
+background:rgba(26,55,118,.06);
+padding:6px var(–sp-7);
+font-family:var(–serif);font-style:italic;
+font-size:.8rem;color:var(–mid);
+border-bottom:1px solid rgba(26,55,118,.07);
+line-height:1.3;
+}
+.conj-body{padding:6px var(–sp-7);}
+.conj-row{display:flex;justify-content:space-between;align-items:baseline;padding:4px 0;}
+.conj-pron{font-size:.72rem;color:var(–ink-faint);}
+.conj-form{font-family:var(–serif);font-style:italic;font-size:.9rem;color:var(–navy);}
+
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+STATS VERB ROW
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+.vstat{display:flex;align-items:center;gap:var(–sp-8);padding:11px 0;border-bottom:1px solid rgba(26,55,118,.05);}
+.vstat:last-child{border-bottom:none;}
+.vstat-name{min-width:130px;font-family:var(–serif);font-style:italic;font-size:.96rem;color:var(–navy);}
+
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+EMPTY STATE
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+.empty{text-align:center;padding:var(–sp-20) var(–sp-8);}
+.empty svg{width:28px;height:28px;margin-bottom:var(–sp-5);opacity:.28;color:var(–navy);}
+.empty p{font-size:.88rem;color:var(–ink-faint);line-height:1.55;}
+
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+TOAST
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+#toast{
+position:fixed;bottom:32px;left:50%;
+transform:translateX(-50%) translateY(70px);
+background:rgba(26,37,58,.88);
+backdrop-filter:blur(12px);
+-webkit-backdrop-filter:blur(12px);
+color:rgba(255,255,255,.92);
+padding:10px var(–sp-10);border-radius:24px;
+font-size:.82rem;z-index:1000;
+transition:transform .3s cubic-bezier(.4,0,.2,1);
+pointer-events:none;letter-spacing:.01em;
+box-shadow:0 8px 24px rgba(26,37,58,.25);
+white-space:nowrap;
+}
+#toast.show{transform:translateX(-50%) translateY(0);}
+
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+SCROLLBAR
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+::-webkit-scrollbar{width:4px;}
+::-webkit-scrollbar-thumb{background:rgba(26,55,118,.15);border-radius:2px;}
+
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+RESPONSIVE
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+/* ── Tablet and below ── */
+@media(max-width:900px){
+body { padding: 12px; }
+#app {
+max-width: 100%;
+height: calc(100vh - 24px);
+max-height: none;
+}
+}
+@media(max-width:640px){
+body { padding: 0; align-items: stretch; }
+#app {
+height: 100vh;
+max-height: none;
+border-radius: 0;           /* full-screen on small phones */
+box-shadow: none;
+}
+header { border-radius: 0; }
+.hdr{padding:0 var(–sp-8);}
+main{padding:var(–sp-8) var(–sp-8) var(–sp-20);}
+.card{padding:var(–sp-8);}
+.nav-btn span{display:none;}
+.nav-btn{padding:6px var(–sp-5);}
+.conj-grid{grid-template-columns:1fr;}
+.q-main{font-size:1.42rem;}
+.kpi-row{grid-template-columns:repeat(2,1fr);}
+.modal{padding:var(–sp-8) var(–sp-7);}
+.tense-grid{grid-template-columns:repeat(auto-fill,minmax(148px,1fr));}
+.radio-row{flex-direction:column;}
+}
+</style>
+
+</head>
+<body>
+<div id="app">
+
+<!-- ── HEADER ── -->
+
+<header>
+  <div class="hdr">
+    <div class="logo">
+      <div class="logo-main">Conjugaison</div>
+      <div class="logo-sub">法语动词变位练习</div>
+    </div>
+    <nav class="nav">
+      <button class="nav-btn active" onclick="gotoPanel('lessons',this)">
+        <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3" y="4" width="6" height="9" rx="1.2"/><rect x="11" y="4" width="6" height="5.5" rx="1.2"/><rect x="11" y="11.5" width="6" height="4.5" rx="1.2"/><rect x="3" y="15" width="6" height="1.5" rx=".5"/></svg>
+        <span>课程</span>
+      </button>
+      <button class="nav-btn" onclick="gotoPanel('quiz',this)">
+        <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="10" cy="10" r="7"/><path d="M10 6.5v3.8l2.5 2"/></svg>
+        <span>练习</span>
+      </button>
+      <button class="nav-btn" onclick="gotoPanel('stats',this)">
+        <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M3.5 14.5l3.5-4.5 4 3 4-6.5"/><line x1="3" y1="17" x2="17" y2="17"/></svg>
+        <span>统计</span>
+      </button>
+    </nav>
+  </div>
+</header>
+
+<main>
+
+<!-- ══════════════════════════ LESSONS ══════════════════════════ -->
+
+<div id="panel-lessons" class="panel active">
+
+  <div class="card">
+    <div class="card-hdr">
+      <div class="card-title">
+        <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M4 5h12v11H4z"/><path d="M4 9h12"/><path d="M9 9v7"/></svg>
+        我的课程
+      </div>
+    </div>
+    <div id="lesson-list" class="lesson-list">
+      <div class="empty">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><rect x="4" y="4" width="16" height="16" rx="3"/><path d="M9 12h6M12 9v6"/></svg>
+        <p>尚无课程<br>在下方创建第一个</p>
+      </div>
+    </div>
+    <div class="div"></div>
+    <div class="input-row">
+      <div class="field">
+        <label class="label">新建课程</label>
+        <input class="input" id="new-lesson" placeholder="例：Leçon 3 — Verbes irréguliers" onkeydown="if(event.key==='Enter')createLesson()"/>
+      </div>
+      <button class="btn btn-primary" onclick="springClick(this,createLesson)">
+        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M8 2v12M2 8h12"/></svg>
+        新建
+      </button>
+    </div>
+  </div>
+
+  <!-- Verb manager -->
+
+  <div id="verb-manager" class="card" style="display:none">
+    <div class="card-hdr">
+      <div class="card-title">
+        <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M4 6h12M4 10h8M4 14h5"/></svg>
+        <span id="vm-lesson-name">...</span>
+      </div>
+      <span class="chip" id="vm-badge">0 个动词</span>
+    </div>
+    <div class="field">
+      <label class="label">添加动词（原形）</label>
+      <div class="input-row">
+        <div class="field">
+          <input class="input" id="new-verb" placeholder="être, aller, finir, prendre, convaincre…" onkeydown="if(event.key==='Enter')addVerb()"/>
+        </div>
+        <button class="btn btn-primary" onclick="springClick(this,addVerb)">
+          <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M8 2v12M2 8h12"/></svg>
+          添加
+        </button>
+      </div>
+    </div>
+    <div style="overflow-x:auto">
+      <table class="vtable" id="verb-table">
+        <thead>
+          <tr>
+            <th>动词原形</th>
+            <th>状态</th>
+            <th>正确率</th>
+            <th style="text-align:right">操作</th>
+          </tr>
+        </thead>
+        <tbody id="verb-tbody"></tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════ QUIZ ══════════════════════════ -->
+
+<div id="panel-quiz" class="panel">
+
+  <div id="quiz-setup" class="card">
+    <div class="card-hdr">
+      <div class="card-title">
+        <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="10" cy="10" r="7"/><path d="M7.5 7.5C7.5 6.1 8.6 5 10 5s2.5 1.1 2.5 2.5c0 1.2-.8 2.1-2 2.4V11"/><circle cx="10" cy="13.5" r=".7" fill="currentColor"/></svg>
+        配置练习
+      </div>
+    </div>
+
+```
+<div class="field">
+  <label class="label">课程</label>
+  <select class="sel" id="sel-lesson" onchange="onLessonChange()">
+    <option value="">— 请选择课程 —</option>
+  </select>
+</div>
+
+<div class="field">
+  <label class="label">出题模式</label>
+  <div class="radio-row">
+    <label class="radio-opt on">
+      <input type="radio" name="qmode" value="tense" checked onchange="onModeChange(this)">
+      <div class="rdot"><div class="rdot-inner"></div></div>
+      按时态出题（全课动词）
+    </label>
+    <label class="radio-opt">
+      <input type="radio" name="qmode" value="verb" onchange="onModeChange(this)">
+      <div class="rdot"><div class="rdot-inner"></div></div>
+      按动词出题（全部时态）
+    </label>
+  </div>
+</div>
+
+<div id="opt-tense">
+  <div class="field">
+    <label class="label">选择时态</label>
+    <div class="tense-grid" id="tense-checks"></div>
+  </div>
+</div>
+
+<div id="opt-verb" style="display:none">
+  <div class="field">
+    <label class="label">选择动词</label>
+    <select class="sel" id="sel-verb"></select>
+  </div>
+  <div class="field">
+    <label class="label">包含的时态</label>
+    <div class="tense-grid" id="tense-checks-verb"></div>
+  </div>
+</div>
+
+<button class="btn btn-primary btn-fw" style="margin-top:var(--sp-6)" onclick="springClick(this,startQuiz)">
+  <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 3l8 5-8 5V3z"/></svg>
+  开始练习
+</button>
+```
+
+  </div>
+
+  <!-- In-quiz -->
+
+  <div id="quiz-area" style="display:none">
+    <div class="card">
+      <div class="prog-row">
+        <span class="prog-label" id="q-counter">0 / 0</span>
+        <div class="prog-track"><div class="prog-fill" id="prog-fill" style="width:0"></div></div>
+        <span class="prog-score" id="q-score">0 正确</span>
+      </div>
+      <div class="q-wrap">
+        <div class="q-tense" id="q-tense"></div>
+        <div class="q-main">
+          <span class="q-pron" id="q-pron"></span>
+          <span class="q-blank"></span>
+          <span class="q-inf" id="q-inf"></span>
+        </div>
+      </div>
+      <div class="ans-row">
+        <input id="answer-input" placeholder="Votre réponse…"
+          onkeydown="if(event.key==='Enter')checkAnswer()"
+          autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+        <button class="btn btn-primary" onclick="springClick(this,checkAnswer)">
+          <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M3 8l4 4 6-6"/></svg>
+          确认
+        </button>
+      </div>
+      <div class="result-bar" id="result-bar"></div>
+      <div class="quiz-actions">
+        <button class="btn btn-primary btn-sm" id="btn-next" onclick="springClick(this,nextQ)" style="display:none">
+          下一题
+          <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 8h8M9 5l3 3-3 3"/></svg>
+        </button>
+        <button class="btn btn-ghost btn-sm" onclick="springClick(this,skipQ)">跳过</button>
+        <button class="btn btn-danger btn-sm" onclick="springClick(this,endQuiz)">结束</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Results -->
+
+  <div id="quiz-results" style="display:none">
+    <div class="card">
+      <div class="card-hdr">
+        <div class="card-title">
+          <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M10 3l2 4.5h5L13.5 11l1.5 5L10 13.5 5 16l1.5-5L3 7.5h5z"/></svg>
+          本次练习结果
+        </div>
+      </div>
+      <div class="kpi-row" id="res-kpis"></div>
+      <div id="res-wrong"></div>
+      <div style="display:flex;gap:var(--sp-5);justify-content:center;margin-top:var(--sp-10)">
+        <button class="btn btn-primary" onclick="springClick(this,restartQuiz)">
+          <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M2 8a6 6 0 1 1 1 3.5"/><path d="M2 12V8h4"/></svg>
+          再练一次
+        </button>
+        <button class="btn btn-ghost" onclick="springClick(this,backSetup)">重新配置</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════ STATS ══════════════════════════ -->
+
+<div id="panel-stats" class="panel">
+  <div class="card">
+    <div class="card-hdr">
+      <div class="card-title">
+        <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M3.5 14.5l3.5-4.5 4 3 4-6.5"/><line x1="3" y1="17" x2="17" y2="17"/></svg>
+        总体统计
+      </div>
+    </div>
+    <div class="kpi-row" id="global-kpis"></div>
+  </div>
+  <div class="card">
+    <div class="card-hdr">
+      <div class="card-title">
+        <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M4 6h12M4 10.5h9M4 15h6"/></svg>
+        各动词正确率
+      </div>
+    </div>
+    <div id="verb-stats-body"></div>
+  </div>
+</div>
+
+</main>
+</div><!-- #app -->
+
+<!-- ══ MODAL ══ -->
+
+<div class="overlay" id="conj-overlay" onclick="handleOverlayClick(event)">
+  <div class="modal" id="conj-modal">
+    <button class="modal-close" onclick="closeModal()">
+      <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M3 3l10 10M13 3L3 13"/></svg>
+    </button>
+    <div class="modal-title" id="modal-title">—</div>
+    <div id="modal-body" class="conj-grid"></div>
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<script>
+'use strict';
+// ══════════════════════════════════════════════════════════
+//  SPRING BUTTON HANDLER
+// ══════════════════════════════════════════════════════════
+function springClick(btn, fn) {
+  btn.classList.remove('spring-bounce');
+  void btn.offsetWidth; // reflow
+  btn.classList.add('spring-bounce');
+  btn.addEventListener('animationend', () => btn.classList.remove('spring-bounce'), { once: true });
+  if (fn) fn();
+}
+
+// ══════════════════════════════════════════════════════════
+//  TENSE DEFINITIONS
+// ══════════════════════════════════════════════════════════
+const TENSES = [
+  { key:'présent',              fr:"le présent" },
+  { key:'imparfait',            fr:"l'imparfait" },
+  { key:'passé_composé',        fr:"le passé composé" },
+  { key:'futur_simple',         fr:"le futur simple" },
+  { key:'conditionnel_présent', fr:"le conditionnel présent" },
+  { key:'subjonctif_présent',   fr:"le subjonctif présent" },
+  { key:'plus_que_parfait',     fr:"le plus-que-parfait" },
+  { key:'passé_simple',         fr:"le passé simple" },
+  { key:'futur_antérieur',      fr:"le futur antérieur" },
+  { key:'conditionnel_passé',   fr:"le conditionnel passé" },
+  { key:'subjonctif_imparfait', fr:"le subjonctif imparfait" },
+  { key:'impératif_présent',    fr:"l'impératif présent" },
+];
+
+const PRON = {
+  présent:              ['je','tu','il / elle','nous','vous','ils / elles'],
+  imparfait:            ['je','tu','il / elle','nous','vous','ils / elles'],
+  passé_composé:        ['je','tu','il / elle','nous','vous','ils / elles'],
+  futur_simple:         ['je','tu','il / elle','nous','vous','ils / elles'],
+  conditionnel_présent: ['je','tu','il / elle','nous','vous','ils / elles'],
+  subjonctif_présent:   ['que je','que tu',"qu'il / elle",'que nous','que vous',"qu'ils / elles"],
+  plus_que_parfait:     ["j'",'tu','il / elle','nous','vous','ils / elles'],
+  passé_simple:         ['je','tu','il / elle','nous','vous','ils / elles'],
+  futur_antérieur:      ["j'",'tu','il / elle','nous','vous','ils / elles'],
+  conditionnel_passé:   ["j'",'tu','il / elle','nous','vous','ils / elles'],
+  subjonctif_imparfait: ['que je','que tu',"qu'il / elle",'que nous','que vous',"qu'ils / elles"],
+  impératif_présent:    ['tu','nous','vous'],
+};
+
+// ══════════════════════════════════════════════════════════
+//  CONJUGATION ENGINE
+// ══════════════════════════════════════════════════════════
+const ETRE_VERBS = new Set([
+  'aller','venir','partir','arriver','entrer','sortir','naître','mourir',
+  'rester','tomber','retourner','monter','descendre','passer','rentrer',
+  'devenir','revenir','parvenir','intervenir','survenir','apparaître','disparaître',
+]);
+const PP_IRREG = {
+  'être':'été','avoir':'eu','aller':'allé','venir':'venu','faire':'fait',
+  'prendre':'pris','comprendre':'compris','apprendre':'appris','reprendre':'repris',
+  'mettre':'mis','promettre':'promis','permettre':'permis','remettre':'remis','commettre':'commis',
+  'dire':'dit','interdire':'interdit','contredire':'contredit','prédire':'prédit',
+  'écrire':'écrit','décrire':'décrit','inscrire':'inscrit','prescrire':'prescrit',
+  'voir':'vu','revoir':'revu','prévoir':'prévu',
+  'vouloir':'voulu','pouvoir':'pu','devoir':'dû','savoir':'su','valoir':'valu',
+  'lire':'lu','croire':'cru','boire':'bu','vivre':'vécu','naître':'né','mourir':'mort',
+  'ouvrir':'ouvert','couvrir':'couvert','découvrir':'découvert','offrir':'offert','souffrir':'souffert',
+  'tenir':'tenu','maintenir':'maintenu','obtenir':'obtenu','contenir':'contenu','soutenir':'soutenu','retenir':'retenu',
+  'recevoir':'reçu','apercevoir':'aperçu','concevoir':'conçu','décevoir':'déçu',
+  'craindre':'craint','plaindre':'plaint','contraindre':'contraint',
+  'peindre':'peint','éteindre':'éteint','atteindre':'atteint','rejoindre':'rejoint','joindre':'joint',
+  'conduire':'conduit','construire':'construit','détruire':'détruit','produire':'produit',
+  'réduire':'réduit','séduire':'séduit','traduire':'traduit','introduire':'introduit',
+  'connaître':'connu','reconnaître':'reconnu','paraître':'paru','disparaître':'disparu',
+  'plaire':'plu','suivre':'suivi','rire':'ri','courir':'couru','suffire':'suffi',
+  'convaincre':'convaincu','vaincre':'vaincu','résoudre':'résolu','acquérir':'acquis',
+  'falloir':'fallu','pleuvoir':'plu','partir':'parti','sortir':'sorti',
+  'dormir':'dormi','servir':'servi','sentir':'senti','mentir':'menti',
+};
+const IRREG = {
+  'être':{présent:['suis','es','est','sommes','êtes','sont'],imparfait:['étais','étais','était','étions','étiez','étaient'],futur_simple:['serai','seras','sera','serons','serez','seront'],conditionnel_présent:['serais','serais','serait','serions','seriez','seraient'],subjonctif_présent:['sois','sois','soit','soyons','soyez','soient'],passé_simple:['fus','fus','fut','fûmes','fûtes','furent'],subjonctif_imparfait:['fusse','fusses','fût','fussions','fussiez','fussent'],impératif_présent:['sois','soyons','soyez']},
+  'avoir':{présent:['ai','as','a','avons','avez','ont'],imparfait:['avais','avais','avait','avions','aviez','avaient'],futur_simple:['aurai','auras','aura','aurons','aurez','auront'],conditionnel_présent:['aurais','aurais','aurait','aurions','auriez','auraient'],subjonctif_présent:['aie','aies','ait','ayons','ayez','aient'],passé_simple:['eus','eus','eut','eûmes','eûtes','eurent'],subjonctif_imparfait:['eusse','eusses','eût','eussions','eussiez','eussent'],impératif_présent:['aie','ayons','ayez']},
+  'aller':{présent:['vais','vas','va','allons','allez','vont'],imparfait:['allais','allais','allait','allions','alliez','allaient'],futur_simple:['irai','iras','ira','irons','irez','iront'],conditionnel_présent:['irais','irais','irait','irions','iriez','iraient'],subjonctif_présent:['aille','ailles','aille','allions','alliez','aillent'],passé_simple:['allai','allas','alla','allâmes','allâtes','allèrent'],impératif_présent:['va','allons','allez']},
+  'faire':{présent:['fais','fais','fait','faisons','faites','font'],imparfait:['faisais','faisais','faisait','faisions','faisiez','faisaient'],futur_simple:['ferai','feras','fera','ferons','ferez','feront'],conditionnel_présent:['ferais','ferais','ferait','ferions','feriez','feraient'],subjonctif_présent:['fasse','fasses','fasse','fassions','fassiez','fassent'],passé_simple:['fis','fis','fit','fîmes','fîtes','firent'],impératif_présent:['fais','faisons','faites']},
+  'pouvoir':{présent:['peux','peux','peut','pouvons','pouvez','peuvent'],imparfait:['pouvais','pouvais','pouvait','pouvions','pouviez','pouvaient'],futur_simple:['pourrai','pourras','pourra','pourrons','pourrez','pourront'],conditionnel_présent:['pourrais','pourrais','pourrait','pourrions','pourriez','pourraient'],subjonctif_présent:['puisse','puisses','puisse','puissions','puissiez','puissent'],passé_simple:['pus','pus','put','pûmes','pûtes','purent'],impératif_présent:['—','—','—']},
+  'vouloir':{présent:['veux','veux','veut','voulons','voulez','veulent'],imparfait:['voulais','voulais','voulait','voulions','vouliez','voulaient'],futur_simple:['voudrai','voudras','voudra','voudrons','voudrez','voudront'],conditionnel_présent:['voudrais','voudrais','voudrait','voudrions','voudriez','voudraient'],subjonctif_présent:['veuille','veuilles','veuille','voulions','vouliez','veuillent'],passé_simple:['voulus','voulus','voulut','voulûmes','voulûtes','voulurent'],impératif_présent:['veuille','veuillons','veuillez']},
+  'savoir':{présent:['sais','sais','sait','savons','savez','savent'],imparfait:['savais','savais','savait','savions','saviez','savaient'],futur_simple:['saurai','sauras','saura','saurons','saurez','sauront'],conditionnel_présent:['saurais','saurais','saurait','saurions','sauriez','sauraient'],subjonctif_présent:['sache','saches','sache','sachions','sachiez','sachent'],passé_simple:['sus','sus','sut','sûmes','sûtes','surent'],impératif_présent:['sache','sachons','sachez']},
+  'devoir':{présent:['dois','dois','doit','devons','devez','doivent'],imparfait:['devais','devais','devait','devions','deviez','devaient'],futur_simple:['devrai','devras','devra','devrons','devrez','devront'],conditionnel_présent:['devrais','devrais','devrait','devrions','devriez','devraient'],subjonctif_présent:['doive','doives','doive','devions','deviez','doivent'],passé_simple:['dus','dus','dut','dûmes','dûtes','durent'],impératif_présent:['—','—','—']},
+  'voir':{présent:['vois','vois','voit','voyons','voyez','voient'],imparfait:['voyais','voyais','voyait','voyions','voyiez','voyaient'],futur_simple:['verrai','verras','verra','verrons','verrez','verront'],conditionnel_présent:['verrais','verrais','verrait','verrions','verriez','verraient'],subjonctif_présent:['voie','voies','voie','voyions','voyiez','voient'],passé_simple:['vis','vis','vit','vîmes','vîtes','virent'],impératif_présent:['vois','voyons','voyez']},
+  'venir':{présent:['viens','viens','vient','venons','venez','viennent'],imparfait:['venais','venais','venait','venions','veniez','venaient'],futur_simple:['viendrai','viendras','viendra','viendrons','viendrez','viendront'],conditionnel_présent:['viendrais','viendrais','viendrait','viendrions','viendriez','viendraient'],subjonctif_présent:['vienne','viennes','vienne','venions','veniez','viennent'],passé_simple:['vins','vins','vint','vînmes','vîntes','vinrent'],impératif_présent:['viens','venons','venez']},
+  'prendre':{présent:['prends','prends','prend','prenons','prenez','prennent'],imparfait:['prenais','prenais','prenait','prenions','preniez','prenaient'],futur_simple:['prendrai','prendras','prendra','prendrons','prendrez','prendront'],conditionnel_présent:['prendrais','prendrais','prendrait','prendrions','prendriez','prendraient'],subjonctif_présent:['prenne','prennes','prenne','prenions','preniez','prennent'],passé_simple:['pris','pris','prit','prîmes','prîtes','prirent'],impératif_présent:['prends','prenons','prenez']},
+  'mettre':{présent:['mets','mets','met','mettons','mettez','mettent'],imparfait:['mettais','mettais','mettait','mettions','mettiez','mettaient'],futur_simple:['mettrai','mettras','mettra','mettrons','mettrez','mettront'],conditionnel_présent:['mettrais','mettrais','mettrait','mettrions','mettriez','mettraient'],subjonctif_présent:['mette','mettes','mette','mettions','mettiez','mettent'],passé_simple:['mis','mis','mit','mîmes','mîtes','mirent'],impératif_présent:['mets','mettons','mettez']},
+  'dire':{présent:['dis','dis','dit','disons','dites','disent'],imparfait:['disais','disais','disait','disions','disiez','disaient'],futur_simple:['dirai','diras','dira','dirons','direz','diront'],conditionnel_présent:['dirais','dirais','dirait','dirions','diriez','diraient'],subjonctif_présent:['dise','dises','dise','disions','disiez','disent'],passé_simple:['dis','dis','dit','dîmes','dîtes','dirent'],impératif_présent:['dis','disons','dites']},
+  'écrire':{présent:['écris','écris','écrit','écrivons','écrivez','écrivent'],imparfait:['écrivais','écrivais','écrivait','écrivions','écriviez','écrivaient'],futur_simple:['écrirai','écriras','écrira','écrirons','écrirez','écriront'],conditionnel_présent:['écrirais','écrirais','écrirait','écririons','écririez','écriraient'],subjonctif_présent:['écrive','écrives','écrive','écrivions','écriviez','écrivent'],passé_simple:['écrivis','écrivis','écrivit','écrivîmes','écrivîtes','écrivirent'],impératif_présent:['écris','écrivons','écrivez']},
+  'lire':{présent:['lis','lis','lit','lisons','lisez','lisent'],imparfait:['lisais','lisais','lisait','lisions','lisiez','lisaient'],futur_simple:['lirai','liras','lira','lirons','lirez','liront'],conditionnel_présent:['lirais','lirais','lirait','lirions','liriez','liraient'],subjonctif_présent:['lise','lises','lise','lisions','lisiez','lisent'],passé_simple:['lus','lus','lut','lûmes','lûtes','lurent'],impératif_présent:['lis','lisons','lisez']},
+  'croire':{présent:['crois','crois','croit','croyons','croyez','croient'],imparfait:['croyais','croyais','croyait','croyions','croyiez','croyaient'],futur_simple:['croirai','croiras','croira','croirons','croirez','croiront'],conditionnel_présent:['croirais','croirais','croirait','croirions','croiriez','croiraient'],subjonctif_présent:['croie','croies','croie','croyions','croyiez','croient'],passé_simple:['crus','crus','crut','crûmes','crûtes','crurent'],impératif_présent:['crois','croyons','croyez']},
+  'boire':{présent:['bois','bois','boit','buvons','buvez','boivent'],imparfait:['buvais','buvais','buvait','buvions','buviez','buvaient'],futur_simple:['boirai','boiras','boira','boirons','boirez','boiront'],conditionnel_présent:['boirais','boirais','boirait','boirions','boiriez','boiraient'],subjonctif_présent:['boive','boives','boive','buvions','buviez','boivent'],passé_simple:['bus','bus','but','bûmes','bûtes','burent'],impératif_présent:['bois','buvons','buvez']},
+  'vivre':{présent:['vis','vis','vit','vivons','vivez','vivent'],imparfait:['vivais','vivais','vivait','vivions','viviez','vivaient'],futur_simple:['vivrai','vivras','vivra','vivrons','vivrez','vivront'],conditionnel_présent:['vivrais','vivrais','vivrait','vivrions','vivriez','vivraient'],subjonctif_présent:['vive','vives','vive','vivions','viviez','vivent'],passé_simple:['vécus','vécus','vécut','vécûmes','vécûtes','vécurent'],impératif_présent:['vis','vivons','vivez']},
+  'courir':{présent:['cours','cours','court','courons','courez','courent'],imparfait:['courais','courais','courait','courions','couriez','couraient'],futur_simple:['courrai','courras','courra','courrons','courrez','courront'],conditionnel_présent:['courrais','courrais','courrait','courrions','courriez','courraient'],subjonctif_présent:['coure','coures','coure','courions','couriez','courent'],passé_simple:['courus','courus','courut','courûmes','courûtes','coururent'],impératif_présent:['cours','courons','courez']},
+  'mourir':{présent:['meurs','meurs','meurt','mourons','mourez','meurent'],imparfait:['mourais','mourais','mourait','mourions','mouriez','mouraient'],futur_simple:['mourrai','mourras','mourra','mourrons','mourrez','mourront'],conditionnel_présent:['mourrais','mourrais','mourrait','mourrions','mourriez','mourraient'],subjonctif_présent:['meure','meures','meure','mourions','mouriez','meurent'],passé_simple:['mourus','mourus','mourut','mourûmes','mourûtes','moururent'],impératif_présent:['meurs','mourons','mourez']},
+  'tenir':{présent:['tiens','tiens','tient','tenons','tenez','tiennent'],imparfait:['tenais','tenais','tenait','tenions','teniez','tenaient'],futur_simple:['tiendrai','tiendras','tiendra','tiendrons','tiendrez','tiendront'],conditionnel_présent:['tiendrais','tiendrais','tiendrait','tiendrions','tiendriez','tiendraient'],subjonctif_présent:['tienne','tiennes','tienne','tenions','teniez','tiennent'],passé_simple:['tins','tins','tint','tînmes','tîntes','tinrent'],impératif_présent:['tiens','tenons','tenez']},
+  'ouvrir':{présent:['ouvre','ouvres','ouvre','ouvrons','ouvrez','ouvrent'],imparfait:['ouvrais','ouvrais','ouvrait','ouvrions','ouvriez','ouvraient'],futur_simple:['ouvrirai','ouvriras','ouvrira','ouvrirons','ouvrirez','ouvriront'],conditionnel_présent:['ouvrirais','ouvrirais','ouvrirait','ouvririons','ouvririez','ouvriraient'],subjonctif_présent:['ouvre','ouvres','ouvre','ouvrions','ouvriez','ouvrent'],passé_simple:['ouvris','ouvris','ouvrit','ouvrîmes','ouvrîtes','ouvrirent'],impératif_présent:['ouvre','ouvrons','ouvrez']},
+  'recevoir':{présent:['reçois','reçois','reçoit','recevons','recevez','reçoivent'],imparfait:['recevais','recevais','recevait','recevions','receviez','recevaient'],futur_simple:['recevrai','recevras','recevra','recevrons','recevrez','recevront'],conditionnel_présent:['recevrais','recevrais','recevrait','recevrions','recevriez','recevraient'],subjonctif_présent:['reçoive','reçoives','reçoive','recevions','receviez','reçoivent'],passé_simple:['reçus','reçus','reçut','reçûmes','reçûtes','reçurent'],impératif_présent:['reçois','recevons','recevez']},
+  'craindre':{présent:['crains','crains','craint','craignons','craignez','craignent'],imparfait:['craignais','craignais','craignait','craignions','craigniez','craignaient'],futur_simple:['craindrai','craindras','craindra','craindrons','craindrez','craindront'],conditionnel_présent:['craindrais','craindrais','craindrait','craindrions','craindriez','craindraient'],subjonctif_présent:['craigne','craignes','craigne','craignions','craigniez','craignent'],passé_simple:['craignis','craignis','craignit','craignîmes','craignîtes','craignirent'],impératif_présent:['crains','craignons','craignez']},
+  'connaître':{présent:['connais','connais','connaît','connaissons','connaissez','connaissent'],imparfait:['connaissais','connaissais','connaissait','connaissions','connaissiez','connaissaient'],futur_simple:['connaîtrai','connaîtras','connaîtra','connaîtrons','connaîtrez','connaîtront'],conditionnel_présent:['connaîtrais','connaîtrais','connaîtrait','connaîtrions','connaîtriez','connaîtraient'],subjonctif_présent:['connaisse','connaisses','connaisse','connaissions','connaissiez','connaissent'],passé_simple:['connus','connus','connut','connûmes','connûtes','connurent'],impératif_présent:['connais','connaissons','connaissez']},
+  'plaire':{présent:['plais','plais','plaît','plaisons','plaisez','plaisent'],imparfait:['plaisais','plaisais','plaisait','plaisions','plaisiez','plaisaient'],futur_simple:['plairai','plairas','plaira','plairons','plairez','plairont'],conditionnel_présent:['plairais','plairais','plairait','plairions','plairiez','plairaient'],subjonctif_présent:['plaise','plaises','plaise','plaisions','plaisiez','plaisent'],passé_simple:['plus','plus','plut','plûmes','plûtes','plurent'],impératif_présent:['plais','plaisons','plaisez']},
+  'suivre':{présent:['suis','suis','suit','suivons','suivez','suivent'],imparfait:['suivais','suivais','suivait','suivions','suiviez','suivaient'],futur_simple:['suivrai','suivras','suivra','suivrons','suivrez','suivront'],conditionnel_présent:['suivrais','suivrais','suivrait','suivrions','suivriez','suivraient'],subjonctif_présent:['suive','suives','suive','suivions','suiviez','suivent'],passé_simple:['suivis','suivis','suivit','suivîmes','suivîtes','suivirent'],impératif_présent:['suis','suivons','suivez']},
+  'rire':{présent:['ris','ris','rit','rions','riez','rient'],imparfait:['riais','riais','riait','riions','riiez','riaient'],futur_simple:['rirai','riras','rira','rirons','rirez','riront'],conditionnel_présent:['rirais','rirais','rirait','ririons','ririez','riraient'],subjonctif_présent:['rie','ries','rie','riions','riiez','rient'],passé_simple:['ris','ris','rit','rîmes','rîtes','rirent'],impératif_présent:['ris','rions','riez']},
+  'convaincre':{présent:['convaincs','convaincs','convainc','convainquons','convainquez','convainquent'],imparfait:['convainquais','convainquais','convainquait','convainquions','convainquiez','convainquaient'],futur_simple:['convaincrai','convaincras','convaincra','convaincrons','convaincrez','convaincront'],conditionnel_présent:['convaincrais','convaincrais','convaincrait','convaincrions','convaincriez','convaincraient'],subjonctif_présent:['convainque','convainques','convainque','convainquions','convainquiez','convainquent'],passé_simple:['convainquis','convainquis','convainquit','convainquîmes','convainquîtes','convainquirent'],impératif_présent:['convaincs','convainquons','convainquez']},
+  'vaincre':{présent:['vaincs','vaincs','vainc','vainquons','vainquez','vainquent'],imparfait:['vainquais','vainquais','vainquait','vainquions','vainquiez','vainquaient'],futur_simple:['vaincrai','vaincras','vaincra','vaincrons','vaincrez','vaincront'],conditionnel_présent:['vaincrais','vaincrais','vaincrait','vaincrions','vaincriez','vaincraient'],subjonctif_présent:['vainque','vainques','vainque','vainquions','vainquiez','vainquent'],passé_simple:['vainquis','vainquis','vainquit','vainquîmes','vainquîtes','vainquirent'],impératif_présent:['vaincs','vainquons','vainquez']},
+  'conduire':{présent:['conduis','conduis','conduit','conduisons','conduisez','conduisent'],imparfait:['conduisais','conduisais','conduisait','conduisions','conduisiez','conduisaient'],futur_simple:['conduirai','conduiras','conduira','conduirons','conduirez','conduiront'],conditionnel_présent:['conduirais','conduirais','conduirait','conduirions','conduiriez','conduiraient'],subjonctif_présent:['conduise','conduises','conduise','conduisions','conduisiez','conduisent'],passé_simple:['conduisis','conduisis','conduisit','conduisîmes','conduisîtes','conduisirent'],impératif_présent:['conduis','conduisons','conduisez']},
+  'résoudre':{présent:['résous','résous','résout','résolvons','résolvez','résolvent'],imparfait:['résolvais','résolvais','résolvait','résolvions','résolviez','résolvaient'],futur_simple:['résoudrai','résoudras','résoudra','résoudrons','résoudrez','résoudront'],conditionnel_présent:['résoudrais','résoudrais','résoudrait','résoudrions','résoudriez','résoudraient'],subjonctif_présent:['résolve','résolves','résolve','résolvions','résolviez','résolvent'],passé_simple:['résolus','résolus','résolut','résolûmes','résolûtes','résolurent'],impératif_présent:['résous','résolvons','résolvez']},
+  'acquérir':{présent:['acquiers','acquiers','acquiert','acquérons','acquérez','acquièrent'],imparfait:['acquérais','acquérais','acquérait','acquérions','acquériez','acquéraient'],futur_simple:['acquerrai','acquerras','acquerra','acquerrons','acquerrez','acquerront'],conditionnel_présent:['acquerrais','acquerrais','acquerrait','acquerrions','acquerriez','acquerraient'],subjonctif_présent:['acquière','acquières','acquière','acquérions','acquériez','acquièrent'],passé_simple:['acquis','acquis','acquit','acquîmes','acquîtes','acquirent'],impératif_présent:['acquiers','acquérons','acquérez']},
+};
+
+function getPP(inf){if(PP_IRREG[inf])return PP_IRREG[inf];if(inf.endsWith('er'))return inf.slice(0,-2)+'é';if(inf.endsWith('ir'))return inf.slice(0,-2)+'i';if(inf.endsWith('re'))return inf.slice(0,-2)+'u';return inf.slice(0,-2)+'i';}
+function getAux(inf){if(inf.startsWith('se ')||inf.startsWith("s'"))return 'être';return ETRE_VERBS.has(inf)?'être':'avoir';}
+function auxForm(aux,t,i){return IRREG[aux]?.[t]?.[i]||aux;}
+function etreAgree(pp,pron){if(!pp||pp==='—')return pp;const fem=/elle/.test(pron)&&!/elles/.test(pron),plFem=/elles/.test(pron),pl=/nous|vous|ils/.test(pron)||plFem;if(plFem)return pp+'es';if(fem)return pp+'e';if(pl)return pp+'s';return pp;}
+function subjImpf(ps){const b=ps[0];if(!b||b==='—')return Array(6).fill('—');const st=b.endsWith('s')?b.slice(0,-1):b;const last=st.slice(-1),rest=st.slice(0,-1),acc={a:'â',e:'ê',i:'î',o:'ô',u:'û'};return[st+'sse',st+'sses',rest+(acc[last]||last)+'t',st+'ssions',st+'ssiez',st+'ssent'];}
+
+function fillCompound(c,inf){
+  const pp=getPP(inf),aux=getAux(inf);
+  const pc6=['je','tu','il / elle','nous','vous','ils / elles'];
+  const pq6=["j'",'tu','il / elle','nous','vous','ils / elles'];
+  if(!c.passé_composé)c.passé_composé=pc6.map((p,i)=>auxForm(aux,'présent',i)+' '+(aux==='être'?etreAgree(pp,p):pp));
+  if(!c.plus_que_parfait)c.plus_que_parfait=pq6.map((p,i)=>auxForm(aux,'imparfait',i)+' '+(aux==='être'?etreAgree(pp,p):pp));
+  if(!c.futur_antérieur)c.futur_antérieur=pq6.map((p,i)=>auxForm(aux,'futur_simple',i)+' '+(aux==='être'?etreAgree(pp,p):pp));
+  if(!c.conditionnel_passé)c.conditionnel_passé=pq6.map((p,i)=>auxForm(aux,'conditionnel_présent',i)+' '+(aux==='être'?etreAgree(pp,p):pp));
+  if(!c.subjonctif_imparfait&&c.passé_simple)c.subjonctif_imparfait=subjImpf(c.passé_simple);
+  if(!c.impératif_présent&&c.présent)c.impératif_présent=[c.présent[1],c.présent[3],c.présent[4]];
+  return c;
+}
+
+function buildCond(fut){return fut.map((f,i)=>{const sfx=['ai','as','a','ons','ez','ont'][i];return f.slice(0,-sfx.length)+['ais','ais','ait','ions','iez','aient'][i];});}
+function erPres(inf){const s=inf.slice(0,-2);if(inf.endsWith('ger'))return[s+'e',s+'es',s+'e',s+'eons',s+'ez',s+'ent'];if(inf.endsWith('cer')){const sc=s.slice(0,-1)+'ç';return[s+'e',s+'es',s+'e',sc+'ons',s+'ez',s+'ent'];}if(inf.endsWith('eler')||inf.endsWith('eter')){const s2=s.slice(0,-1),ll=s.slice(-1);return[s2+ll+ll+'e',s2+ll+ll+'es',s2+ll+ll+'e',s+'ons',s+'ez',s2+ll+ll+'ent'];}if(/é[^aeiou]+er$/.test(inf)){const ss=s.replace(/é([^aeiou]+)$/,'è$1');return[ss+'e',ss+'es',ss+'e',s+'ons',s+'ez',ss+'ent'];}return[s+'e',s+'es',s+'e',s+'ons',s+'ez',s+'ent'];}
+function ruleConj(inf){
+  let s,pres,impf,fut,cond,subj,ps,imp;
+  if(inf.endsWith('er')){s=inf.slice(0,-2);pres=erPres(inf);impf=[s+'ais',s+'ais',s+'ait',s+'ions',s+'iez',s+'aient'];const b=inf.endsWith('e')?inf.slice(0,-1):inf;fut=[b+'rai',b+'ras',b+'ra',b+'rons',b+'rez',b+'ront'];cond=buildCond(fut);const ss=pres[5].endsWith('ent')?pres[5].slice(0,-3):s;subj=[ss+'e',ss+'es',ss+'e',s+'ions',s+'iez',ss+'ent'];ps=[s+'ai',s+'as',s+'a',s+'âmes',s+'âtes',s+'èrent'];imp=[pres[1],pres[3],pres[4]];}
+  else if(inf.endsWith('ir')){s=inf.slice(0,-2);const IR2=/(?:finir|choisir|réussir|remplir|agir|obéir|réfléchir|grandir|grossir|maigrir|rougir|blanchir|vieillir|punir|bâtir|nourrir|saisir|subir|accomplir|réunir|gémir|polir)$/.test(inf);if(IR2){pres=[s+'is',s+'is',s+'it',s+'issons',s+'issez',s+'issent'];impf=[s+'issais',s+'issais',s+'issait',s+'issions',s+'issiez',s+'issaient'];subj=[s+'isse',s+'isses',s+'isse',s+'issions',s+'issiez',s+'issent'];ps=[s+'is',s+'is',s+'it',s+'îmes',s+'îtes',s+'irent'];}else{const ss=s.slice(0,-1);pres=[ss+'s',ss+'s',ss+'t',s+'ons',s+'ez',s+'ent'];impf=[s+'ais',s+'ais',s+'ait',s+'ions',s+'iez',s+'aient'];subj=[s+'e',s+'es',s+'e',s+'ions',s+'iez',s+'ent'];ps=[s+'is',s+'is',s+'it',s+'îmes',s+'îtes',s+'irent'];}fut=[inf+'ai',inf+'as',inf+'a',inf+'ons',inf+'ez',inf+'ont'];cond=buildCond(fut);imp=[pres[1],pres[3],pres[4]];}
+  else{s=inf.slice(0,-2);pres=[s+'s',s+'s',s+'',s+'ons',s+'ez',s+'ent'];impf=[s+'ais',s+'ais',s+'ait',s+'ions',s+'iez',s+'aient'];fut=[inf+'ai',inf+'as',inf+'a',inf+'ons',inf+'ez',inf+'ont'];cond=buildCond(fut);subj=[s+'e',s+'es',s+'e',s+'ions',s+'iez',s+'ent'];ps=[s+'is',s+'is',s+'it',s+'îmes',s+'îtes',s+'irent'];imp=[pres[1],pres[3],pres[4]];}
+  return{présent:pres,imparfait:impf,futur_simple:fut,conditionnel_présent:cond,subjonctif_présent:subj,passé_simple:ps,impératif_présent:imp};
+}
+
+function conjugate(raw){
+  const inf=raw.trim().toLowerCase();
+  if(IRREG[inf])return{ok:true,conj:fillCompound(JSON.parse(JSON.stringify(IRREG[inf])),inf)};
+  const pfx=['re','dé','é','in','sur','sous','pré','entre','con','par','pro','contra','contre','inter','extra','im','ir'];
+  for(const p of pfx){if(inf.startsWith(p)&&IRREG[inf.slice(p.length)]){const base=inf.slice(p.length);const bc=JSON.parse(JSON.stringify(IRREG[base]));const pc={};for(const[t,fs]of Object.entries(bc))pc[t]=fs.map(f=>f==='—'?'—':p+f);return{ok:true,conj:fillCompound(pc,inf)};}}
+  try{return{ok:true,conj:fillCompound(ruleConj(inf),inf)};}catch{return{ok:false,conj:{}};}
+}
+
+// ══════════════════════════════════════════════════════════
+//  STORAGE
+// ══════════════════════════════════════════════════════════
+const LS={g:(k,d)=>{try{const v=localStorage.getItem(k);return v?JSON.parse(v):d;}catch{return d;}},s:(k,v)=>{try{localStorage.setItem(k,JSON.stringify(v));}catch{}}};
+let lessons=LS.g('cjv_lessons',[]);
+let verbData=LS.g('cjv_verbs',{});
+let stats=LS.g('cjv_stats',{});
+function saveAll(){LS.s('cjv_lessons',lessons);LS.s('cjv_verbs',verbData);LS.s('cjv_stats',stats);}
+
+// ══════════════════════════════════════════════════════════
+//  NAVIGATION
+// ══════════════════════════════════════════════════════════
+function gotoPanel(name,btn){
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+  document.getElementById('panel-'+name).classList.add('active');
+  document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  if(name==='quiz')buildQuizUI();
+  if(name==='stats')renderStats();
+}
+
+// ══════════════════════════════════════════════════════════
+//  LESSONS
+// ══════════════════════════════════════════════════════════
+let selId=null;
+function renderLessons(){
+  const el=document.getElementById('lesson-list');
+  if(!lessons.length){el.innerHTML=`<div class="empty"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><rect x="4" y="4" width="16" height="16" rx="3"/><path d="M9 12h6M12 9v6"/></svg><p>尚无课程<br>在下方创建第一个</p></div>`;return;}
+  el.innerHTML=lessons.map(l=>{const cnt=l.verbs.length,ok=l.verbs.filter(v=>verbData[v]?.ok).length;return`<div class="lesson-item${selId===l.id?' selected':''}" onclick="selectLesson('${l.id}')"><div class="lesson-dot"></div><div class="lesson-name">${esc(l.name)}</div><div class="lesson-meta">${cnt} 词 · ${ok} 就绪</div><button class="btn btn-danger btn-xs" onclick="event.stopPropagation();springClick(this,()=>deleteLesson('${l.id}'))"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3l10 10M13 3L3 13"/></svg></button></div>`;}).join('');
+}
+function createLesson(){const v=document.getElementById('new-lesson').value.trim();if(!v){toast('请输入课程名称');return;}const l={id:Date.now()+'',name:v,verbs:[]};lessons.push(l);saveAll();document.getElementById('new-lesson').value='';renderLessons();selectLesson(l.id);toast('课程已创建');}
+function deleteLesson(id){if(!confirm('确定删除？'))return;lessons=lessons.filter(l=>l.id!==id);if(selId===id){selId=null;document.getElementById('verb-manager').style.display='none';}saveAll();renderLessons();}
+function selectLesson(id){selId=id;const l=lessons.find(l=>l.id===id);document.getElementById('vm-lesson-name').textContent=l.name;document.getElementById('verb-manager').style.display='block';renderLessons();renderVerbTable();}
+
+// ══════════════════════════════════════════════════════════
+//  VERBS
+// ══════════════════════════════════════════════════════════
+function addVerb(){if(!selId)return;const inp=document.getElementById('new-verb');const inf=inp.value.trim().toLowerCase();if(!inf){toast('请输入动词原形');return;}const l=lessons.find(l=>l.id===selId);if(l.verbs.includes(inf)){toast('该动词已存在');return;}const res=conjugate(inf);verbData[inf]={ok:res.ok,conj:res.conj};l.verbs.push(inf);saveAll();inp.value='';renderVerbTable();renderLessons();toast(res.ok?`« ${inf} » 已添加`:`« ${inf} » 已添加（变位可能不完整）`);}
+function removeVerb(inf){if(!selId)return;const l=lessons.find(l=>l.id===selId);l.verbs=l.verbs.filter(v=>v!==inf);saveAll();renderVerbTable();renderLessons();}
+function getAcc(inf){let c=0,t=0;Object.entries(stats).forEach(([k,v])=>{if(k.startsWith(inf+'|')){c+=v.c;t+=v.c+v.w;}});return{c,t,pct:t>0?Math.round(c/t*100):0};}
+function accCls(p){return p>=70?'acc-hi':p>=40?'acc-mid':'acc-lo';}
+function renderVerbTable(){if(!selId)return;const l=lessons.find(l=>l.id===selId);document.getElementById('vm-badge').textContent=l.verbs.length+' 个动词';const tbody=document.getElementById('verb-tbody');if(!l.verbs.length){tbody.innerHTML=`<tr><td colspan="4"><div class="empty" style="padding:32px"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><path d="M12 6v6m0 0v6m0-6h6m-6 0H6"/></svg><p>在上方添加动词</p></div></td></tr>`;return;}tbody.innerHTML=l.verbs.map(inf=>{const vd=verbData[inf]||{};const pill=vd.ok?'<span class="status status-ok">已就绪</span>':'<span class="status status-err">不完整</span>';const a=getAcc(inf);const accHtml=a.t>0?`<div class="acc"><div class="acc-track"><div class="acc-fill ${accCls(a.pct)}" style="width:${a.pct}%"></div></div><span class="acc-num">${a.pct}%</span></div>`:'<span class="acc-num">—</span>';return`<tr><td><span class="verb-name">${esc(inf)}</span></td><td>${pill}</td><td>${accHtml}</td><td style="text-align:right;white-space:nowrap">${vd.ok?`<button class="btn btn-ghost btn-xs" style="margin-right:6px" onclick="springClick(this,()=>showModal('${inf}'))">查看</button>`:''}<button class="btn btn-danger btn-xs" onclick="springClick(this,()=>removeVerb('${inf}'))"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3l10 10M13 3L3 13"/></svg></button></td></tr>`;}).join('');}
+
+// ══════════════════════════════════════════════════════════
+//  MODAL
+// ══════════════════════════════════════════════════════════
+function showModal(inf){const vd=verbData[inf];if(!vd?.ok)return;document.getElementById('modal-title').textContent=inf;document.getElementById('modal-body').innerHTML=TENSES.map(t=>{const forms=vd.conj[t.key];if(!forms)return'';const prons=PRON[t.key]||PRON.présent;const rows=prons.map((p,i)=>{const f=Array.isArray(forms)?forms[i]:'—';if(!f||f==='—')return'';return`<div class="conj-row"><span class="conj-pron">${esc(p)}</span><span class="conj-form">${esc(f)}</span></div>`;}).filter(Boolean).join('');if(!rows)return'';return`<div class="conj-block"><div class="conj-head">${esc(t.fr)}</div><div class="conj-body">${rows}</div></div>`;}).join('');document.getElementById('conj-overlay').classList.add('open');document.body.style.overflow='hidden';}
+function closeModal(){document.getElementById('conj-overlay').classList.remove('open');document.body.style.overflow='';}
+function handleOverlayClick(e){if(e.target===document.getElementById('conj-overlay'))closeModal();}
+document.addEventListener('keydown',e=>{if(e.key==='Escape')closeModal();});
+
+// ══════════════════════════════════════════════════════════
+//  QUIZ SETUP
+// ══════════════════════════════════════════════════════════
+function buildQuizUI(){
+  const sel=document.getElementById('sel-lesson');
+  const cur=sel.value;
+  sel.innerHTML='<option value="">— 请选择课程 —</option>'+lessons.map(l=>`<option value="${l.id}"${l.id===cur?' selected':''}>${esc(l.name)}</option>`).join('');
+  buildTenseChecks('tense-checks');
+  buildTenseChecks('tense-checks-verb');
+  onLessonChange();
+}
+function buildTenseChecks(cid){
+  document.getElementById(cid).innerHTML=TENSES.map(t=>`<label class="tense-opt on"><input type="checkbox" value="${t.key}" checked onchange="this.closest('.tense-opt').classList.toggle('on',this.checked)"><div class="tbox"><svg class="tbox-mark" viewBox="0 0 10 8" fill="none" stroke="white" stroke-width="2"><path d="M1 4l3 3 5-6"/></svg></div>${esc(t.fr)}</label>`).join('');
+}
+function onLessonChange(){const id=document.getElementById('sel-lesson').value;const vs=document.getElementById('sel-verb');if(!id){vs.innerHTML='<option>请先选择课程</option>';return;}const l=lessons.find(l=>l.id===id);const ready=(l?.verbs||[]).filter(v=>verbData[v]?.ok);vs.innerHTML=ready.length?ready.map(v=>`<option value="${v}">${v}</option>`).join(''):'<option>该课程无已就绪动词</option>';}
+function onModeChange(radio){document.querySelectorAll('.radio-opt').forEach(el=>el.classList.toggle('on',el.querySelector('input')===radio));const isTense=radio.value==='tense';document.getElementById('opt-tense').style.display=isTense?'':'none';document.getElementById('opt-verb').style.display=isTense?'none':'';}
+
+// ══════════════════════════════════════════════════════════
+//  QUIZ ENGINE
+// ══════════════════════════════════════════════════════════
+let QQ=[],QI=0,QC=0,QW=0,awaitNext=false,wrongList=[];
+function startQuiz(){const lid=document.getElementById('sel-lesson').value;if(!lid){toast('请选择课程');return;}const mode=document.querySelector('input[name="qmode"]:checked').value;const q=buildQs(lid,mode);if(!q)return;QQ=q;QI=0;QC=0;QW=0;awaitNext=false;wrongList=[];document.getElementById('quiz-setup').style.display='none';document.getElementById('quiz-area').style.display='block';document.getElementById('quiz-results').style.display='none';showQ();}
+function buildQs(lid,mode){const l=lessons.find(l=>l.id===lid);const getTs=cid=>[...document.querySelectorAll(`#${cid} input:checked`)].map(i=>i.value);let qs=[];if(mode==='tense'){const ts=getTs('tense-checks');if(!ts.length){toast('请至少选一个时态');return null;}const verbs=l.verbs.filter(v=>verbData[v]?.ok);if(!verbs.length){toast('无已就绪动词');return null;}verbs.forEach(inf=>ts.forEach(tk=>{const forms=verbData[inf]?.conj?.[tk];if(!forms)return;const ps=PRON[tk]||PRON.présent;ps.forEach((pron,i)=>{const f=Array.isArray(forms)?forms[i]:'';if(f&&f!=='—')qs.push({inf,tk,pron,ans:f});});}));}else{const inf=document.getElementById('sel-verb').value;if(!inf||!verbData[inf]?.ok){toast('请选择有效动词');return null;}const ts=getTs('tense-checks-verb');if(!ts.length){toast('请至少选一个时态');return null;}ts.forEach(tk=>{const forms=verbData[inf]?.conj?.[tk];if(!forms)return;const ps=PRON[tk]||PRON.présent;ps.forEach((pron,i)=>{const f=Array.isArray(forms)?forms[i]:'';if(f&&f!=='—')qs.push({inf,tk,pron,ans:f});});});}if(!qs.length){toast('无法生成题目');return null;}return shuffle(qs);}
+function showQ(){if(QI>=QQ.length){showResults();return;}const q=QQ[QI];const tense=TENSES.find(t=>t.key===q.tk);document.getElementById('q-tense').textContent=tense?.fr||q.tk;document.getElementById('q-pron').textContent=q.pron;document.getElementById('q-inf').textContent='('+q.inf+')';document.getElementById('answer-input').value='';const rb=document.getElementById('result-bar');rb.className='result-bar';rb.textContent='';document.getElementById('btn-next').style.display='none';document.getElementById('answer-input').focus();awaitNext=false;const tot=QQ.length;document.getElementById('q-counter').textContent=`${QI+1} / ${tot}`;document.getElementById('prog-fill').style.width=`${(QI/tot)*100}%`;document.getElementById('q-score').textContent=`${QC} 正确`;}
+function checkAnswer(){if(awaitNext){nextQ();return;}const q=QQ[QI];const user=document.getElementById('answer-input').value.trim();if(!user)return;const correct=norm(user)===norm(q.ans);const sk=`${q.inf}|${q.tk}|${q.pron}`;if(!stats[sk])stats[sk]={c:0,w:0};if(correct){stats[sk].c++;QC++;}else{stats[sk].w++;QW++;wrongList.push(q);}saveAll();const rb=document.getElementById('result-bar');rb.className='result-bar '+(correct?'correct':'wrong');rb.textContent=correct?`Correct — ${q.ans}`:`Faux. La bonne réponse : ${q.ans}`;document.getElementById('btn-next').style.display='inline-flex';document.getElementById('q-score').textContent=`${QC} 正确`;awaitNext=true;}
+function nextQ(){QI++;showQ();}
+function skipQ(){QI++;showQ();}
+function endQuiz(){showResults();}
+function showResults(){document.getElementById('quiz-area').style.display='none';document.getElementById('quiz-results').style.display='block';const tot=QI,pct=tot>0?Math.round(QC/tot*100):0;document.getElementById('res-kpis').innerHTML=`<div class="kpi"><div class="kpi-num">${tot}</div><div class="kpi-lbl">题目</div></div><div class="kpi"><div class="kpi-num" style="color:var(--ok)">${QC}</div><div class="kpi-lbl">正确</div></div><div class="kpi"><div class="kpi-num" style="color:var(--err)">${QW}</div><div class="kpi-lbl">错误</div></div><div class="kpi"><div class="kpi-num">${pct}%</div><div class="kpi-lbl">正确率</div></div>`;const wr=document.getElementById('res-wrong');if(wrongList.length){const seen=new Set();const uniq=wrongList.filter(q=>{const k=q.inf+'|'+q.tk+'|'+q.pron;return seen.has(k)?false:(seen.add(k),true);});wr.innerHTML=`<div class="sec-label">错误题目</div>`+uniq.map(q=>{const tf=TENSES.find(t=>t.key===q.tk)?.fr||q.tk;return`<div class="wrong-row"><div class="wrong-q">${esc(q.pron)} ___ (${esc(q.inf)}, <em>${esc(tf)}</em>)</div><div class="wrong-right">${esc(q.ans)}</div></div>`;}).join('');}else{wr.innerHTML=`<div style="text-align:center;color:var(--ok);padding:var(--sp-8);font-family:var(--serif);font-style:italic;font-size:1.05rem">Parfait — toutes les réponses sont correctes.</div>`;}}
+function restartQuiz(){QQ=shuffle(QQ);QI=0;QC=0;QW=0;awaitNext=false;wrongList=[];document.getElementById('quiz-results').style.display='none';document.getElementById('quiz-area').style.display='block';showQ();}
+function backSetup(){document.getElementById('quiz-results').style.display='none';document.getElementById('quiz-setup').style.display='block';}
+
+// ══════════════════════════════════════════════════════════
+//  STATS
+// ══════════════════════════════════════════════════════════
+function renderStats(){let tc=0,tw=0;const va={};Object.entries(stats).forEach(([k,v])=>{const[inf]=k.split('|');tc+=v.c;tw+=v.w;if(!va[inf])va[inf]={c:0,t:0};va[inf].c+=v.c;va[inf].t+=v.c+v.w;});const tot=tc+tw,pct=tot>0?Math.round(tc/tot*100):0;document.getElementById('global-kpis').innerHTML=`<div class="kpi"><div class="kpi-num">${tot}</div><div class="kpi-lbl">总答题</div></div><div class="kpi"><div class="kpi-num" style="color:var(--ok)">${tc}</div><div class="kpi-lbl">正确</div></div><div class="kpi"><div class="kpi-num" style="color:var(--err)">${tw}</div><div class="kpi-lbl">错误</div></div><div class="kpi"><div class="kpi-num">${pct}%</div><div class="kpi-lbl">正确率</div></div><div class="kpi"><div class="kpi-num">${Object.keys(va).length}</div><div class="kpi-lbl">动词数</div></div>`;const sorted=Object.entries(va).sort((a,b)=>(a[1].t>0?a[1].c/a[1].t:1)-(b[1].t>0?b[1].c/b[1].t:1));const vsb=document.getElementById('verb-stats-body');if(!sorted.length){vsb.innerHTML=`<div class="empty" style="padding:32px"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><path d="M3 14l4-5 4 3 4-6"/><path d="M3 17h14"/></svg><p>开始练习后<br>统计将显示在此处</p></div>`;return;}vsb.innerHTML=sorted.map(([inf,a])=>{const p=a.t>0?Math.round(a.c/a.t*100):0;return`<div class="vstat"><div class="vstat-name">${esc(inf)}</div><div class="acc-track" style="flex:1"><div class="acc-fill ${accCls(p)}" style="width:${p}%"></div></div><div class="acc-num" style="min-width:88px;text-align:right">${a.c} / ${a.t} · ${p}%</div></div>`;}).join('');}
+
+// ══════════════════════════════════════════════════════════
+//  UTILS
+// ══════════════════════════════════════════════════════════
+function norm(s){return s.trim().toLowerCase().replace(/[àâä]/g,'a').replace(/[éèêë]/g,'e').replace(/[îï]/g,'i').replace(/[ôö]/g,'o').replace(/[ùûü]/g,'u').replace(/ç/g,'c').replace(/\s+/g,' ');}
+function shuffle(a){const b=[...a];for(let i=b.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[b[i],b[j]]=[b[j],b[i]];}return b;}
+function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+let _tt;
+function toast(msg){const el=document.getElementById('toast');el.textContent=msg;el.classList.add('show');clearTimeout(_tt);_tt=setTimeout(()=>el.classList.remove('show'),2600);}
+
+// ── INIT ──
+renderLessons();
+</script>
+
+</body>
+</html>
